@@ -34,12 +34,14 @@ export function resetStoreState (store, state, hot) {
   store.getters = {}
   // reset local getters cache
   store._makeLocalGettersCache = Object.create(null)
-  const wrappedGetters = store._wrappedGetters
+  const wrappedGetters = store._wrappedGetters // installModule 初始化的getters
   const computedObj = {}
+  // 通过循环 把 _wrappedGetters 挂载到 store.getters上面
   forEachValue(wrappedGetters, (fn, key) => {
     // use computed to leverage its lazy-caching mechanism
     // direct inline function use will lead to closure preserving oldState.
     // using partial to return function with only arguments preserved in closure environment.
+    // getters 用的是一个闭包的方式处理
     computedObj[key] = partial(fn, store)
     Object.defineProperty(store.getters, key, {
       // TODO: use `computed` when it's possible. at the moment we can't due to
@@ -81,9 +83,9 @@ export function installModule (store, rootState, path, module, hot) {
     store._modulesNamespaceMap[namespace] = module
   }
 
-  // set state
+  // set state 安装模块之间的状态
   if (!isRoot && !hot) {
-    const parentState = getNestedState(rootState, path.slice(0, -1))
+    const parentState = getNestedState(rootState, path.slice(0, -1)) // 拿到父节点的状态
     const moduleName = path[path.length - 1]
     store._withCommit(() => {
       if (__DEV__) {
@@ -115,6 +117,7 @@ export function installModule (store, rootState, path, module, hot) {
     registerGetter(store, namespacedType, getter, local)
   })
 
+  // 递归子模块
   module.forEachChild((child, key) => {
     installModule(store, rootState, path.concat(key), child, hot)
   })
@@ -202,6 +205,7 @@ export function makeLocalGetters (store, namespace) {
   return store._makeLocalGettersCache[namespace]
 }
 
+// 把_mutations注册为一个数组
 function registerMutation (store, type, handler, local) {
   const entry = store._mutations[type] || (store._mutations[type] = [])
   entry.push(function wrappedMutationHandler (payload) {

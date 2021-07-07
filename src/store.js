@@ -64,12 +64,14 @@ export class Store {
 
     // initialize the store state, which is responsible for the reactivity
     // (also registers _wrappedGetters as computed properties)
+    // 把状态挂在到 this 上面
     resetStoreState(this, state)
 
     // apply plugins
     plugins.forEach(plugin => plugin(this))
   }
 
+  // 交给 vue 插件使用
   install (app, injectKey) {
     app.provide(injectKey || storeKey, this)
     app.config.globalProperties.$store = this
@@ -257,6 +259,8 @@ export class Store {
     resetStore(this, true)
   }
 
+  // 目的是 严格模式下的 commit 的同步更改
+  // 切片
   _withCommit (fn) {
     const committing = this._committing
     this._committing = true
