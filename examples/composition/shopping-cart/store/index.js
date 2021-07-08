@@ -1,4 +1,4 @@
-import { createStore, createLogger } from 'vuex'
+import { createStore } from '../../../../myStore'
 import cart from './modules/cart'
 import products from './modules/products'
 
@@ -9,6 +9,5 @@ export default createStore({
     cart,
     products
   },
-  strict: debug,
-  plugins: debug ? [createLogger()] : []
+  strict: debug
 })

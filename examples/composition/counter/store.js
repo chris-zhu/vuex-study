@@ -1,4 +1,4 @@
-import { createStore } from 'vuex'
+import { createStore } from '../../../myStore/store'
 
 // root state object.
 // each Vuex instance is just a single state tree.
